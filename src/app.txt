@@ -1,0 +1,77 @@
+import { useEffect, useState } from "react";
+import { ActionButton } from "./components/ActiomButton";
+import { Temporal } from "@js-temporal/polyfill";
+
+interface InitialCountProp {
+  count: number;
+}
+
+const InitialCount = 0;
+
+export default function App({ count = InitialCount }: InitialCountProp) {
+  const safeInitial = typeof count === "number" && count >= 0 ? count : 0;
+  const [countState, setCountState] = useState(safeInitial);
+  const [time, setTime] = useState('')
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = Temporal.Now.zonedDateTimeISO("Asia/Manila");
+      const formatted = now.toLocaleString("en-PH", {
+        hour: 'numeric',
+        minute: 'numeric',
+        second: 'numeric',
+        hour12: true,
+      });
+      setTime(formatted);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const countFuncAdd = () => {
+    if (countState < 10) setCountState(countState + 1);
+  };
+
+  const countFuncMin = () => {
+    if (countState > 0) setCountState(countState - 1);
+  };
+
+  const reset = () => setCountState(InitialCount);
+
+  return (
+    <div className="flex items-center justify-center pt-20">
+      <p>Philippine time: {time} </p>
+      <div className="p-4">
+        <h1 className="text-5xl">Value: {countState}</h1>
+
+        <div className="flex justify-between pt-20 gap-4">
+          <ActionButton
+            onClick={countFuncAdd}
+            disabled={countState >= 10}
+            className="bg-blue-900 hover:bg-blue-700"
+          >
+            Add
+          </ActionButton>
+
+          <ActionButton
+            onClick={countFuncMin}
+            disabled={countState <= 0}
+            className="bg-red-900 hover:bg-red-700"
+          >
+            Minus
+          </ActionButton>
+        </div>
+
+        <div className="flex justify-center mt-20">
+          <ActionButton
+            onClick={reset}
+            disabled={countState === 0}
+            className="bg-green-900 hover:bg-green-700"
+          >
+            Reset
+          </ActionButton>
+        </div>
+      </div>
+    </div>
+  );
+}
