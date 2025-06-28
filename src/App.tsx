@@ -134,7 +134,10 @@ export default function App() {
             {notes.map((note) => (
               <li
                 key={note.id}
-                onClick={() => setActiveNoteId(note.id)}
+                onClick={() => {
+                  setActiveNoteId(note.id);
+                  setConfirmationButton(false);
+                }}
                 className={`px-3 py-2 rounded cursor-pointer mb-1 transition ${
                   activeNoteId === note.id
                     ? "bg-white/30 font-semibold"
