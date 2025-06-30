@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Temporal } from "@js-temporal/polyfill";
-import { Download, Folder, Plus, SquareCheck, Trash } from "lucide-react";
+import { Download, Folder, Menu, Plus, SquareCheck, Trash } from "lucide-react";
 
 import "./App.css";
 
@@ -17,6 +17,7 @@ export default function App() {
   const [previousTitle, setPreviousTitle] = useState<string | null>(null)
   const [canAddNote, setCanAddNote] = useState(true);
   const [confirmationButton, setConfirmationButton] = useState(false)
+ const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false)
 
   useEffect(() => {
     const savedNotes = localStorage.getItem("multi-notes");
@@ -115,8 +116,15 @@ export default function App() {
   return (
     <div className="min-h-screen flex font-sans">
       {/* Sidebar */}
-      <aside className="fixed top-0 left-0 h-full w-64 bg-gradient-to-b from-orange-400 to-pink-500 text-white flex flex-col p-6 shadow-lg">
-        <div className="flex items-center justify-between mb-6">
+      <Menu
+        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+        className={`fixed top-5 left-4 w-6 h-6 cursor-pointer z-50 ${
+          isSidebarOpen ? "text-gray-200" : "text-orange-600"
+        }`}
+      />
+      {isSidebarOpen && (<aside className="fixed top-0 left-0 h-full w-64 bg-gradient-to-b from-orange-400 to-pink-500 text-white flex flex-col p-6 shadow-lg">
+  
+        <div className="flex items-center justify-between mb-6 pt-5">
           <h2 className="text-xl font-extrabold flex items-center gap-2">
             <Folder className="w-5 h-5" /> MyNotes
           </h2>
@@ -162,11 +170,12 @@ export default function App() {
           <Download className="w-4 h-4" /> Download Note
         </button>
       </aside>
-
+)}
       {/* Editor */}
-      <main className="ml-64 flex-1 p-8 bg-orange-50 min-h-screen">
+      <main className={`${isSidebarOpen ? "md:ml-64" : "ml-0"} flex-1 p-8 pt-15 bg-orange-50 min-h-screen`}>
+
         {activeNote ? (
-          <div className="max-w-3xl mx-auto">
+          <div className="max-w-3xl mx-auto flex flex-col h-full">
             <input
               type="text"
               value={activeNote.title}
@@ -184,7 +193,7 @@ export default function App() {
             <textarea
               value={activeNote.content}
               onChange={(e) => updateNote({ content: e.target.value })}
-              className="w-full h-80 px-4 py-2 border border-orange-300 rounded resize-none focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white"
+              className="w-full flex-1 px-4 py-2 border border-orange-300 rounded resize-none focus:outline-none focus:ring-2 focus:ring-orange-400 bg-white"
               placeholder="Write your note..."
             />
 
@@ -196,8 +205,10 @@ export default function App() {
               <button
                 onClick={() => setConfirmationButton(true)}
                 className="inline-flex items-center gap-1 px-3 py-1.5 rounded bg-red-600 text-white text-sm hover:bg-red-700"
-              >
-                <Trash className="w-4 h-4"/> Delete Note
+              > 
+              <span className="hidden md:inline">Delete Note</span>
+              <Trash className="inline md:hidden w-4 h-4"/>
+
               </button>
               {confirmationButton && (
                 <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
